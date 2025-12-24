@@ -75,6 +75,8 @@ mod write_buffer;
 pub use config::UnsecureProvider;
 pub use extensions::extension_data::signature_algorithms::SignatureScheme;
 pub use handshake::certificate_verify::CertificateVerify;
+pub use handshake::certificate::CertificateRef;
+pub use handshake::certificate::CertificateEntryRef;
 pub use rand_core::{CryptoRng, CryptoRngCore};
 
 #[cfg(feature = "webpki")]
