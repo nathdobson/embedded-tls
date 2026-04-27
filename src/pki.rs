@@ -67,7 +67,7 @@ where
     Clock: TlsClock,
     CipherSuite: TlsCipherSuite,
 {
-    ca: Certificate<&'a [u8]>,
+    cas: &'a [Certificate<&'a [u8]>],
     host: Option<heapless::String<64>>,
     certificate_transcript: Option<CipherSuite::Hash>,
     certificate: Option<OwnedCertificate<CERT_SIZE>>,
@@ -80,9 +80,9 @@ where
     CipherSuite: TlsCipherSuite,
 {
     #[must_use]
-    pub fn new(ca: Certificate<&'a [u8]>) -> Self {
+    pub fn new(cas: &'a [Certificate<&'a [u8]>]) -> Self {
         Self {
-            ca,
+            cas,
             host: None,
             certificate_transcript: None,
             certificate: None,
@@ -109,14 +109,19 @@ where
         transcript: &CipherSuite::Hash,
         cert: ServerCertificate,
     ) -> Result<(), TlsError> {
-        let mut names = CertificateNames {
-            common_name: None,
-            san_dns_names: heapless::Vec::new(),
-        };
-
-        for (p, q) in CertificateChain::new(&(&self.ca).into(), &cert) {
-            names = verify_certificate(p, q, Clock::now())?;
+        let mut names = None;
+        for (index, ca) in self.cas.iter().enumerate() {
+            for (p, q) in CertificateChain::new(&ca.into(), &cert) {
+                names = verify_certificate(p, q, Clock::now()).ok();
+                if names.is_none() {
+                    break;
+                }
+            }
+            if names.is_some() {
+                break;
+            }
         }
+        let names = names.ok_or(TlsError::InvalidCertificate)?;
 
         if !tls_hostname_match(&names, &self.host) {
             error!(
