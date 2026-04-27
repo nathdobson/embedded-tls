@@ -110,7 +110,7 @@ where
         cert: ServerCertificate,
     ) -> Result<(), TlsError> {
         let mut names = None;
-        for (index, ca) in self.cas.iter().enumerate() {
+        for ca in self.cas {
             for (p, q) in CertificateChain::new(&ca.into(), &cert) {
                 names = verify_certificate(p, q, Clock::now()).ok();
                 if names.is_none() {
