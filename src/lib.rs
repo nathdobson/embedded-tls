@@ -50,7 +50,7 @@ async fn main() {
 // This mod MUST go first, so that the others see its macros.
 pub(crate) mod fmt;
 
-use parse_buffer::ParseError;
+pub use parse_buffer::ParseError;
 pub mod alert;
 mod application_data;
 pub mod blocking;
