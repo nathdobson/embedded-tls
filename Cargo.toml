@@ -35,6 +35,7 @@ const-oid = { version = "0.10.1", optional = true }
 der = { version = "0.8.0-rc.2", features = ["derive", "oid", "time", "heapless"], optional = true }
 signature = { version = "2.2", default-features = false }
 ecdsa = { version = "0.16.9", default-features = false }
+thiserror={version="2.0.18",default-features = false}
 
 # Logging alternatives
 log = { version = "0.4", optional = true }

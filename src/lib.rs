@@ -78,6 +78,7 @@ pub use handshake::certificate_verify::CertificateVerify;
 pub use handshake::certificate::CertificateRef;
 pub use handshake::certificate::CertificateEntryRef;
 pub use rand_core::{CryptoRng, CryptoRngCore};
+use thiserror::Error;
 
 #[cfg(feature = "webpki")]
 pub mod webpki;
@@ -92,42 +93,75 @@ pub use asynch::*;
 
 pub use flush_policy::*;
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Error)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum TlsError {
+    #[error("connection closed")]
     ConnectionClosed,
+    #[error("unimplemented")]
     Unimplemented,
+    #[error("missing handshake")]
     MissingHandshake,
+    #[error("handshake aborted ({0}, {1})")]
     HandshakeAborted(alert::AlertLevel, alert::AlertDescription),
+    #[error("abort handshake ({0}, {1})")]
     AbortHandshake(alert::AlertLevel, alert::AlertDescription),
+    #[error("generic IO error")]
     IoError,
+    #[error("internal error")]
     InternalError,
+    #[error("invalid record")]
     InvalidRecord,
+    #[error("unknown content type")]
     UnknownContentType,
+    #[error("invalid nonce length")]
     InvalidNonceLength,
+    #[error("invalid ticket length")]
     InvalidTicketLength,
+    #[error("unknown extension type")]
     UnknownExtensionType,
+    #[error("insufficient space")]
     InsufficientSpace,
+    #[error("invalid handshake")]
     InvalidHandshake,
+    #[error("invalid cipher suite")]
     InvalidCipherSuite,
+    #[error("invalid signature scheme")]
     InvalidSignatureScheme,
+    #[error("invalid signature")]
     InvalidSignature,
+    #[error("invalid extensions length")]
     InvalidExtensionsLength,
+    #[error("invalid session ID length")]
     InvalidSessionIdLength,
+    #[error("invalid supported versions")]
     InvalidSupportedVersions,
+    #[error("invalid application data")]
     InvalidApplicationData,
+    #[error("invalid key share")]
     InvalidKeyShare,
+    #[error("invalid certificate")]
     InvalidCertificate,
+    #[error("invalid certificate entry")]
     InvalidCertificateEntry,
+    #[error("invalid certificate request")]
     InvalidCertificateRequest,
+    #[error("invalid private key")]
     InvalidPrivateKey,
+    #[error("unable to initialize crypto engine")]
     UnableToInitializeCryptoEngine,
-    ParseError(ParseError),
+    #[error("parse error")]
+    ParseError(#[from] ParseError),
+    #[error("out of memory")]
     OutOfMemory,
+    #[error("crypto error")]
     CryptoError,
+    #[error("encode error")]
     EncodeError,
+    #[error("decode error")]
     DecodeError,
-    Io(embedded_io::ErrorKind),
+    #[error("IO error")]
+    Io(#[from] embedded_io::ErrorKind),
 }
 
 impl embedded_io::Error for TlsError {
@@ -140,14 +174,6 @@ impl embedded_io::Error for TlsError {
         }
     }
 }
-
-impl core::fmt::Display for TlsError {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{self:?}")
-    }
-}
-
-impl core::error::Error for TlsError {}
 
 #[cfg(feature = "std")]
 mod stdlib {

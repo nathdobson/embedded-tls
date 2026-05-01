@@ -1,11 +1,14 @@
-use crate::TlsError;
 use heapless::{CapacityError, Vec};
+use thiserror::Error;
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Error)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum ParseError {
+    #[error("insufficient bytes")]
     InsufficientBytes,
+    #[error("insufficient space")]
     InsufficientSpace,
+    #[error("invalid data")]
     InvalidData,
 }
 
@@ -166,8 +169,3 @@ impl<'b> ParseBuffer<'b> {
     }
 }
 
-impl From<ParseError> for TlsError {
-    fn from(e: ParseError) -> Self {
-        TlsError::ParseError(e)
-    }
-}

@@ -1,12 +1,22 @@
 use crate::TlsError;
 use crate::buffer::CryptoBuffer;
 use crate::parse_buffer::ParseBuffer;
+use core::fmt::{Display, Formatter};
 
 #[derive(Debug, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum AlertLevel {
     Warning = 1,
     Fatal = 2,
+}
+
+impl Display for AlertLevel {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        match self {
+            AlertLevel::Warning => write!(f, "warning"),
+            AlertLevel::Fatal => write!(f, "fatal"),
+        }
+    }
 }
 
 impl AlertLevel {
@@ -50,6 +60,42 @@ pub enum AlertDescription {
     UnknownPskIdentity = 115,
     CertificateRequired = 116,
     NoApplicationProtocol = 120,
+}
+
+impl Display for AlertDescription {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        match self {
+            AlertDescription::CloseNotify => write!(f, "close notify"),
+            AlertDescription::UnexpectedMessage => write!(f, "unexpected message"),
+            AlertDescription::BadRecordMac => write!(f, "bad record mac"),
+            AlertDescription::RecordOverflow => write!(f, "record overflow"),
+            AlertDescription::HandshakeFailure => write!(f, "handshake failure"),
+            AlertDescription::BadCertificate => write!(f, "bad certificate"),
+            AlertDescription::UnsupportedCertificate => write!(f, "unsupported certificate"),
+            AlertDescription::CertificateRevoked => write!(f, "certificate revoked"),
+            AlertDescription::CertificateExpired => write!(f, "certificate expired"),
+            AlertDescription::CertificateUnknown => write!(f, "certificate unknown"),
+            AlertDescription::IllegalParameter => write!(f, "illegal parameter"),
+            AlertDescription::UnknownCa => write!(f, "unknown CA"),
+            AlertDescription::AccessDenied => write!(f, "access denied"),
+            AlertDescription::DecodeError => write!(f, "decode error"),
+            AlertDescription::DecryptError => write!(f, "decrypt error"),
+            AlertDescription::ProtocolVersion => write!(f, "protocol version"),
+            AlertDescription::InsufficientSecurity => write!(f, "insufficient security"),
+            AlertDescription::InternalError => write!(f, "internal error"),
+            AlertDescription::InappropriateFallback => write!(f, "inappropriate fallback"),
+            AlertDescription::UserCanceled => write!(f, "user canceled"),
+            AlertDescription::MissingExtension => write!(f, "missing extension"),
+            AlertDescription::UnsupportedExtension => write!(f, "unsupported extension"),
+            AlertDescription::UnrecognizedName => write!(f, "unrecognized name"),
+            AlertDescription::BadCertificateStatusResponse => {
+                write!(f, "bad certificate status response")
+            }
+            AlertDescription::UnknownPskIdentity => write!(f, "unknown psk identity"),
+            AlertDescription::CertificateRequired => write!(f, "certificate required"),
+            AlertDescription::NoApplicationProtocol => write!(f, "no application protocol"),
+        }
+    }
 }
 
 impl AlertDescription {
